@@ -6,11 +6,12 @@ import SimpleHTTPServer
 import SocketServer
 from io import BytesIO
 
+import gspread
 import google_io as scoreSheets
 import sys
 
 HOST_NAME = 'localhost'
-PORT_NUMBER = 80
+PORT_NUMBER = 85
 
 
 class MyHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
@@ -36,13 +37,10 @@ class MyHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         params = query["parameters"]
         
 
-        if intent == "getEmail":
+        if intent == "Start score keeper":
           print("The email to use is : " + str(params["sheetemail"]))
           scoreSheets.new_game(params["sheetemail"])
-          
-        elif intent == "getPlayers":
-          print("Need list of players")
-          scoreSheets.add_players(params["players"])
+          scoreSheets.add_players(params["playernames"])
 
         elif intent == "addScore":
           print("Adding %d to %s" % (int(params["points"]), params["playername"]))
@@ -76,6 +74,9 @@ class MyHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         else:
           print("Uknown intent met: " + str(intent))
 
+      except gspread.exceptions.APIError as e:
+        print("Found api error")
+        print(str(e))
       except :
         print("Uknown POST Request encountered")
         print("Error: ", sys.exc_info()[0])
