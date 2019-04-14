@@ -18,6 +18,11 @@ def get_num_players():
     num_players = len(sh.row_values(1))
     return num_players
 
+def get_num_rounds():
+    sh = gc.open("Score!").sheet1
+    num_rounds = len(sh.col_values(1)) - 1
+    return num_rounds
+
 def clear_scores():
     sheet = gc.open("Score!").sheet1
     set_frozen(sheet, rows=1)
@@ -29,6 +34,7 @@ def clear_scores():
 def new_round():
     sheet = gc.open("Score!").sheet1
     num_players = get_num_players()
+    round_num = get_num_rounds()
     for i in range(1,num_players+1):
         cell = sheet.cell(2,i)
         val = cell.value

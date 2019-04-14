@@ -2,14 +2,19 @@
 
 import time
 import json
-from http.server import BaseHTTPRequestHandler, HTTPServer
+# from http.server import BaseHTTPRequestHandler, HTTPServer
+import SimpleHTTPServer 
+import SocketServer
 from io import BytesIO
 
+import google_io as scoreSheets
+import sys
+
 HOST_NAME = 'localhost'
-PORT_NUMBER = 80
+PORT_NUMBER = 88
 
 
-class MyHandler(BaseHTTPRequestHandler):
+class MyHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
     def do_HEAD(self):
       self.send_response(200)
       self.send_header('Content-type', 'text/html')
@@ -34,21 +39,37 @@ class MyHandler(BaseHTTPRequestHandler):
 
         if intent == "getEmail":
           print("The email to use is : " + str(params["sheetemail"]))
-          pass
+          scoreSheets.new_game(params["sheetemail"])
+          
         elif intent == "getPlayers":
           print("Need list of players")
-          pass
+          scoreSheets.add_players(params["players"])
         elif intent == "addScore":
           print("Adding %d to %s" % (int(params["points"]), params["playername"]))
-          pass
+          scoreSheets.update_score(params["playername"], params["points"])
+
         elif intent == "getScore":
           print("Need to get a player's score")
-          pass
+
+        elif intent == "clearRound":
+          print("Clearing round")
+          scoreSheets.clear_scores()
+
+        elif intent == "addPlayer":
+          print("Adding new player")
+          scoreSheets.add_players([params["playername"]])
+
+        elif intent == "nextRound":
+          print("Next round")
+          scoreSheets.new_round()
+          
         else:
           print("Uknown intent met: " + str(intent))
 
-      except:
+      except :
         print("Uknown POST Request encountered")
+        print("Error: ", sys.exc_info()[0])
+
 
     def handle_http(self, status_code, path):
       self.send_response(status_code)
@@ -67,8 +88,7 @@ class MyHandler(BaseHTTPRequestHandler):
       self.wfile.write(response)
 
 if __name__ == '__main__':
-    server_class = HTTPServer
-    httpd = server_class((HOST_NAME, PORT_NUMBER), MyHandler)
+    httpd = SocketServer.TCPServer(("", PORT_NUMBER), MyHandler) 
     print(time.asctime(), 'Server Starts - %s:%s' % (HOST_NAME, PORT_NUMBER))
     try:
         httpd.serve_forever()
