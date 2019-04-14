@@ -2,7 +2,6 @@
 
 import time
 import json
-# from http.server import BaseHTTPRequestHandler, HTTPServer
 import SimpleHTTPServer 
 import SocketServer
 from io import BytesIO
@@ -11,7 +10,7 @@ import google_io as scoreSheets
 import sys
 
 HOST_NAME = 'localhost'
-PORT_NUMBER = 88
+PORT_NUMBER = 80
 
 
 class MyHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
@@ -44,6 +43,7 @@ class MyHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         elif intent == "getPlayers":
           print("Need list of players")
           scoreSheets.add_players(params["players"])
+
         elif intent == "addScore":
           print("Adding %d to %s" % (int(params["points"]), params["playername"]))
           scoreSheets.update_score(params["playername"], params["points"])
@@ -62,7 +62,17 @@ class MyHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         elif intent == "nextRound":
           print("Next round")
           scoreSheets.new_round()
-          
+
+        elif intent == "getLeader":
+          print("Getting Leader")
+          leader = scoreSheets.get_leader()
+          print("Leader is : %s" % (leader,))
+          resp = "{\"messages\": [{\"speech\": \"%s is currently in the lead right now\",\"type\": 0}]}" % (leader,)
+          print(resp)
+          jsonResp = json.loads(resp)
+          print(str(jsonResp))
+          self.wfile.write(bytes(jsonResp))   
+
         else:
           print("Uknown intent met: " + str(intent))
 
