@@ -49,7 +49,18 @@ def add_players(list_of_players):
         sheet.update_cell(1,i,x)
         num_players += 1
     clear_scores()
-
+def get_leader()
+    sh = gc.open("Score!").sheet1
+    leader = ""
+    curr_max = 0
+    sum = 0
+    for j in range(1,len(sh.row_values(1)))
+        for i in range(2,len(sh.col_values(1)))
+            sum += int(sh.cell(i,j).value)
+        if sum > curr_max
+                leader = sh.cell(1,j)
+                curr_max = sum
+    return leader
 def update_score(player,score):
     sheet = gc.open("Score!").sheet1
     cell = sheet.find(player)
