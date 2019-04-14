@@ -1,0 +1,18 @@
+import httplib2
+ from oauth2client.contrib import gce
+
+ credentials = gce.AppAssertionCredentials(
+   scope='https://www.googleapis.com/auth/devstorage.read_write')
+ http = credentials.authorize(httplib2.Http())
+
+
+ # Restrict access to users who've granted access to Calendar info.
+ decorator = appengine.OAuth2DecoratorFromClientSecrets(
+   'client_secrets.json',
+   scope='https://www.googleapis.com/auth/calendar')
+
+ class MainHandler(webapp.RequestHandler):
+   @decorator.oauth_required
+   def get(self):
+     http = decorator.http()
+     request = service.events().list(calendarId='primary')
